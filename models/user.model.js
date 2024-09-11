@@ -49,10 +49,18 @@ const userSchema = new mongoose.Schema({
 });
 
 // Pre-save middleware to hash the PIN
+// userSchema.pre('save', async function(next) {
+//     if (this.isModified('pin')) {
+//         const salt = await bcrypt.genSalt(10);
+//         this.pin = await bcrypt.hash(this.pin, salt);  // Hash the pin before saving
+//     }
+//     next();
+// });
+
 userSchema.pre('save', async function(next) {
     if (this.isModified('pin')) {
-        const salt = await bcrypt.genSalt(10);
-        this.pin = await bcrypt.hash(this.pin, salt);  // Hash the pin before saving
+        // Directly hash the pin with salt rounds
+        this.pin = await bcrypt.hash(this.pin, 10);  // Hash the pin before saving with 10 salt rounds
     }
     next();
 });
