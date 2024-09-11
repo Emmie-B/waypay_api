@@ -1,0 +1,29 @@
+import User from "../models/user.model.js";
+import bcrypt from 'bcrypt';
+
+const login = async (req, res) => {
+    let userLoggedIn = false;
+
+    try {
+        const { phone, pin } = req.body;
+        const user = await User.findOne({ phone: phone });
+
+        if (user) {
+            const isMatch = await bcrypt.compare(pin, user.pin);  // Compare pin using bcrypt
+            if (isMatch) {
+                userLoggedIn = true;
+                res.status(200).json({ message: "Login Successful", userLoggedIn: userLoggedIn });
+            } else {
+                res.status(400).json({ message: "Invalid Credentials", userLoggedIn: userLoggedIn });
+            }
+        } else {
+            res.status(400).json({ message: "Invalid Credentials", userLoggedIn: userLoggedIn });
+        }
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
+export default login;
