@@ -12,9 +12,9 @@ const login = async (req, res) => {
             const isMatch = await bcrypt.compare(pin, user.pin);  // Compare pin using bcrypt
             if (isMatch) {
                 userLoggedIn = true;
-                res.status(200).json({ message: "Login Successful", userLoggedIn: userLoggedIn, user: user });
+                res.status(200).json({ message: "Login Successful", success: userLoggedIn, user: user });
             } else {
-                res.status(400).json({ message: "Invalid Credentials", success: userLoggedIn });
+                res.status(400).json({ message: "Invalid Credentials", success: userLoggedIn, user: null });
             }
         } else {
             res.status(400).json({ message: "Invalid Credentials", success: userLoggedIn, user: null});
