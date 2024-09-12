@@ -4,9 +4,9 @@ import User from '../models/user.model.js';
 const createAccount = async (req, res) => {
     try {
       // Validate required fields
-      const { name, phone, accountType, pin, password, profileUrl } = req.body;
+      const { name, phone, accountType, pin, profileUrl } = req.body;
       
-      if (!name || !phone || !accountType || !pin || !password) {
+      if (!name || !phone || !accountType || !pin ) {
         return res.status(400).json({
           message: "All fields are required: name, phone, accountType, pin, password."
         });
