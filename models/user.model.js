@@ -26,7 +26,12 @@ const userSchema = new mongoose.Schema({
     },
     profileUrl: {
         type: String,
-        required: true,
+        required: false,
+        trim: true
+    },
+    address: {
+        type: String,
+        required: false,
         trim: true
     },
     pin: {

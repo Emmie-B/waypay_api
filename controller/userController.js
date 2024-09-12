@@ -4,7 +4,7 @@ import User from '../models/user.model.js';
 const createAccount = async (req, res) => {
     try {
       // Validate required fields
-      const { name, phone, accountType, pin, profileUrl } = req.body;
+      const { name, phone, accountType, pin, address, profileUrl } = req.body;
       
       if (!name || !phone || !accountType || !pin ) {
         return res.status(400).json({
@@ -28,7 +28,7 @@ const createAccount = async (req, res) => {
         phone: phone,
         accountType: accountType,
         pin: pin,
-        password: password,
+        address: address || "",  // Optional field with default value
         publicKey: keypair.publicKey.toBase58(),
         privateKey: keypair.secretKey.toString(),
         profileUrl: profileUrl || "",  // Optional field with default value
