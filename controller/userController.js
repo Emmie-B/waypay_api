@@ -4,11 +4,11 @@ import User from '../models/user.model.js';
 const createAccount = async (req, res) => {
     try {
       // Validate required fields
-      const { name, phone, accountType, pin, address, profileUrl } = req.body;
+      const { name, phone, accountType, pin, profileUrl } = req.body;
       
       if (!name || !phone || !accountType || !pin ) {
         return res.status(400).json({
-          message: "All fields are required: name, phone, accountType, pin, password."
+          message: "All fields are required: name, phone, accountType, pin, profileUrl",
         });
       }
   
@@ -16,7 +16,7 @@ const createAccount = async (req, res) => {
       const existingUser = await User.findOne({ phone: phone });
   
       if (existingUser) {
-        return res.status(200).json({ data: existingUser, userExist: true });
+        return res.status(200).json({ data: existingUser, success: false, message: "Account already exists"});
       }
   
       // Generate keypair for the new user
@@ -28,7 +28,6 @@ const createAccount = async (req, res) => {
         phone: phone,
         accountType: accountType,
         pin: pin,
-        address: address || "",  // Optional field with default value
         publicKey: keypair.publicKey.toBase58(),
         privateKey: keypair.secretKey.toString(),
         profileUrl: profileUrl || "",  // Optional field with default value

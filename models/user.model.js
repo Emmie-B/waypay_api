@@ -22,18 +22,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-        enum: ['user', 'business', 'driver']  // Example of predefined account types
+        enum: ['individual', 'business', 'driver']  // Example of predefined account types
     },
     profileUrl: {
         type: String,
         required: false,
         trim: true
     },
-    address: {
-        type: String,
-        required: false,
-        trim: true
-    },
+    
     pin: {
         type: String,
         required: true,
