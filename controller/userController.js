@@ -36,13 +36,15 @@ const createAccount = async (req, res) => {
   
       // Save the user to the database
       const savedUser = await user.save();
-      res.status(201).json({ data: savedUser, usercreated: true });
+      res.status(201).json({ data: savedUser, success: true, message: "Account created successfully"});
   
     } catch (err) {
       // Handle errors
       console.error("Error creating account:", err);
       res.status(500).send({
-        message: err.message || 'Some error occurred while creating the User.'
+        message: err.message || 'Some error occurred while creating the User.',
+        date:null,
+        success: false
       });
     }
   };
