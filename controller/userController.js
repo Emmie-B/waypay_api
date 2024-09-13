@@ -30,9 +30,11 @@ const createAccount = async (req, res) => {
         pin: pin,
         publicKey: keypair.publicKey.toBase58(),
         privateKey: keypair.secretKey.toString(),
-        profileUrl: profileUrl || "",  // Optional field with default value
+        profileUrl: profileUrl || "",
+        accountBalance:"10",
+        fareToken:"10",
+        points:"10"  // Optional field with default value
       });
-  
       // Save the user to the database
       const savedUser = await user.save();
       res.status(201).json({ data: savedUser, success: true, message: "Account created successfully"});

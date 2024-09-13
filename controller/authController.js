@@ -17,7 +17,7 @@ const login = async (req, res) => {
                 res.status(400).json({ message: "Invalid Credentials", success: userLoggedIn, user: null });
             }
         } else {
-            res.status(400).json({ message: "Invalid Credentials", success: userLoggedIn, user: null});
+            res.status(404).json({ message: "Account not found", success: userLoggedIn, user: null});
         }
 
     } catch (error) {

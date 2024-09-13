@@ -13,7 +13,17 @@ const userSchema = new mongoose.Schema({
         trim: true,
         unique: true  // Ensure phone numbers are unique
     },
-    gender: {
+    accountBalance: {
+        type: String,
+        required: false,
+        trim: true,
+    },
+    fareToken: {
+        type: String,
+        required: false,
+        trim: true,
+    },
+    points: {
         type: String,
         required: false,
         trim: true,
@@ -49,15 +59,7 @@ const userSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Pre-save middleware to hash the PIN
-// userSchema.pre('save', async function(next) {
-//     if (this.isModified('pin')) {
-//         const salt = await bcrypt.genSalt(10);
-//         this.pin = await bcrypt.hash(this.pin, salt);  // Hash the pin before saving
-//     }
-//     next();
-// });
-
+// Pre-save middleware to hash the PIN before saving
 userSchema.pre('save', async function(next) {
     if (this.isModified('pin')) {
         // Directly hash the pin with salt rounds
