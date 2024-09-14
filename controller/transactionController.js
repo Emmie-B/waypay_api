@@ -200,7 +200,7 @@ const transaction = async (req, res) => {
          message: message,
        });
        const sendmsg2sender = await sendMsg({
-         numbers: recipient.phone,
+         numbers: sender.phone,
          message: messageSender,
        });
       res.status(200).json({
