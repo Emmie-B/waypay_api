@@ -270,7 +270,7 @@ const getTransactionHistory = async (req, res) => {
       $or: [{ senderId: userId }, { recipientId: userId }]
     })
       .sort({ createdAt: -1 }) // Sort by most recent
-      .limit(1)            // Limit number of transactions
+      .limit(10)            // Limit number of transactions
       .populate('senderId', 'name')
       .populate('recipientId', 'name');// Populate recipient's name
 
