@@ -16,7 +16,8 @@ const transactionSchema = new mongoose.Schema({
         required: true
     },
     transactionType: { type: String, enum: ['send', 'receive'], required: true },
-    transactionDate: { type: Date, default: Date.now },
+    transactionDate: { type: Date, default: Date.now , required: true},
+
     status: {
         type: String,
         required: true,
