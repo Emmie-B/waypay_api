@@ -9,6 +9,9 @@ import {
 } from '@solana/web3.js';
 import 'dotenv/config';
 import User from '../models/user.model.js';
+import CustomerSubscription from '../models/subscription.model.js';
+import TransactionModel from '../models/transaction.model.js';
+import sendMsg from './sendMsgController.js';
 
 const makeTransfer = async (req, res) => {
   try {
@@ -40,7 +43,6 @@ const makeTransfer = async (req, res) => {
 
      const toPubKey = new PublicKey(receiver.publicKey);
     
-
 
     // Validate public keys
     if (!PublicKey.isOnCurve(toPubKey) || !PublicKey.isOnCurve(fromPubkey)) {
@@ -118,40 +120,104 @@ const getBalance = async (req, res) => {
 
 
 const transaction = async (req, res) => {
+  const { senderId, phone, amount } = req.body;
   try {
-    const { userId, businessId, amount, transactionType } = req.body;
+// check if the sender and recipient exist
+    const  recipient = await User.findOne({phone: phone});
+    console.log(recipient)
+    const recipientId =  recipient._id;
+    if (!recipient) {
+      return res.status(404).json({ message: 'Recipient not found' });
+    }else{
 
-    // Only check subscription if the transaction is related to a business
-    if (transactionType === 'business') {
-      // Check if this is the user's first transaction with the business
-      const existingTransaction = await Transaction.findOne({
-        userId: userId,
-        businessId: businessId
-      });
+        // uodate the sender and recipient balance
+        const sender = await User.findById(senderId);
+        // const recipient = await User.findById(recipientId);
 
-      if (!existingTransaction) {
-        // If no existing transaction is found, subscribe the user to the business
-        await subscribe(userId, businessId);
-        console.log('User subscribed to the business.');
-      }
-    }
+var senderBalance = parseInt(sender.accountBalance);
+var recipientBalance = parseInt(recipient.accountBalance);
+const transactionAmount = parseInt(amount);
+console.log(typeof(senderBalance))
+console.log(typeof(recipientBalance))
 
-    // Continue with the transaction logic
-    const newTransaction = new Transaction({
-      userId,
-      businessId,
+
+// Check if account balances and amount are valid numbers
+if (isNaN(sender.accountBalance) || isNaN(recipient.accountBalance) || isNaN(transactionAmount) || transactionAmount <= 0) {
+  return res.status(400).json({ message: 'Invalid account balance or amount.' });
+}
+
+// Check if the sender has enough balance
+if (sender.accountBalance < transactionAmount) {
+  return res.status(400).json({ message: 'Insufficient balance for the transaction.' });
+}
+
+// Update the sender's and recipient's balances
+sender.accountBalance = parseInt(sender.accountBalance) - transactionAmount;
+recipient.accountBalance = parseInt(recipient.accountBalance) + transactionAmount;
+
+console.log(recipient.accountBalance);
+console.log(sender.accountBalance);
+ 
+
+    // Save the updated balances
+    await sender.save();
+    await recipient.save();
+
+    // send sms
+    const message = `You have received ${amount} from ${sender.name}. Your new balance is ${recipient.accountBalance}`;
+
+    const sendmsg = await sendMsg({
+      numbers: recipient.phone,
+      message: message
+  });
+
+  console.log(sendmsg)
+
+    // Create a new transaction entry
+    const newTransaction = new TransactionModel({
+      senderId,
+      recipientId,
       amount,
-      transactionType,
-      status: 'completed'
+      status: 'completed',
+      transactionType: 'send'
     });
 
     await newTransaction.save();
 
-    res.status(200).json({
-      message: 'Transaction completed successfully',
-      transaction: newTransaction
-    });
+        
+          
+      res.status(200).json({
+        success: true,
+        message: 'Transaction completed successfully',
+        transaction: sender
+      });
+    }
+    // Only check subscription if the transaction is related to a business
+    // if (recipient.accountType === 'business') {
+    //   // Check if this is the user's first transaction with the business
+    //   const existingTransaction = await TransactionModel.findOne({
+    //     senderId:senderId,
+    //     recipientId: recipientId
+    //   });
 
+    //   if (!existingTransaction) {
+    //     // If no existing transaction is found, subscribe the user to the business
+    //     const userResponse = req.body.subscribe; // This would come from frontend
+    //     if (userResponse === 'yes') {
+    //       // Create a new subscription entry
+    //       const newSubscription = new CustomerSubscription({
+    //         user_id: senderId,
+    //         business_id: recipientId,
+    //         status: 'active'
+    //       });
+    //       await newSubscription.save();
+    //       return res.status(200).json({
+    //         message: `You have successfully subscribed to ${recipient.name}.`
+    //       });
+    //     }
+    //   }
+    // }
+  
   } catch (error) {
     console.error('Error processing transaction:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -161,11 +227,13 @@ const transaction = async (req, res) => {
 // Function to subscribe a user to a business
 const subscribe = async (userId, businessId) => {
   try {
-    const newSubscription = new Subscription({
+    const newSubscription = new CustomerSubscription({
       userId,
       businessId,
-      subscribedAt: new Date()
+      status: 'active'
     });
+
+    
 
     await newSubscription.save();
     console.log('Subscription saved successfully');

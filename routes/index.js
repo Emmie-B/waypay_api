@@ -1,9 +1,10 @@
 import express from 'express';
 import {createAccount} from '../controller/userController.js';
 import sendSMS from '../controller/smsController.js';
-import makeTransfer from '../controller/transactionController.js';
+import transaction from '../controller/transactionController.js';
 import createPaymentURL from '../controller/transferRequestController.js';
 import login from '../controller/authController.js';
+import sendMsg from '../controller/smsController.js';
 
 
 const router = express.Router();
@@ -14,7 +15,8 @@ router.post('/createaccount', createAccount);
 router.post('/send-sms', sendSMS );
 
 // transfer route
-router.get('/transfer', makeTransfer );
+// router.get('/transfer', makeTransfer );
+router.get('/transfer', transaction );
 router.get('/paymentUrl', createPaymentURL );
 
 router.post('/login', login)

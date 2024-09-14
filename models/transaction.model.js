@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 
 const transactionSchema = new mongoose.Schema({
-    sender: {
+    senderId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
-    receiver: {
+    recipientId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
@@ -15,10 +15,16 @@ const transactionSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    transactionType: { type: String, enum: ['send', 'receive'], required: true },
+    transactionDate: { type: Date, default: Date.now },
     status: {
         type: String,
         required: true,
         enum: ['pending', 'completed', 'failed']
+    },
+    transactionHash: {
+        type: String,
+        required: false,
     }
 },
 {
@@ -26,6 +32,6 @@ const transactionSchema = new mongoose.Schema({
 });
 
 
-const Transaction = mongoose.model('Transaction', transactionSchema);
+const TransactionModel = mongoose.model('Transaction', transactionSchema);
 
-export default Transaction;
+export default TransactionModel;
