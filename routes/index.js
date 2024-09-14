@@ -16,8 +16,8 @@ router.post('/send-sms', sendSMS );
 
 // transfer route
 // router.get('/transfer', makeTransfer );
-router.get('/transfer', transaction );
-router.get('/paymentUrl', createPaymentURL );
+router.post('/transfer', transaction );
+router.post('/paymentUrl', createPaymentURL );
 
 router.post('/login', login)
 
