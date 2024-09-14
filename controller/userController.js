@@ -16,7 +16,7 @@ const createAccount = async (req, res) => {
       const existingUser = await User.findOne({ phone: phone });
   
       if (existingUser) {
-        return res.status(200).json({ data: existingUser, success: false, message: "Account already exists"});
+        return res.status(200).json({ user: existingUser, success: false, message: "Account already exists"});
       }
   
       // Generate keypair for the new user
