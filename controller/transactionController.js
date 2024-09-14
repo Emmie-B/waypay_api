@@ -168,17 +168,7 @@ const transaction = async (req, res) => {
       await sender.save();
       await recipient.save();
 
-      // send sms
-      const message = `Hello ${recipient.name}, You have received NLe${amount} from ${sender.name}. Your new balance is NLe${recipient.accountBalance}`;
-      const messageSender = `Hello ${sender.name}, You have have sent NLe${amount} to ${recipient.name}. Your new balance is NLe${recipient.accountBalance}`;
-      const sendmsg = await sendMsg({
-        numbers: recipient.phone,
-        message: message,
-      });
-      const sendmsg2sender = await sendMsg({
-        numbers: recipient.phone,
-        message: messageSender,
-      });
+     
       // console.log(sendmsg)
       // console.log(sendmsg2sender)
 
@@ -202,6 +192,17 @@ const transaction = async (req, res) => {
       await newTransaction.save();
       await newRecipientTransaction.save();
 
+       // send sms
+       const message = `Hello ${recipient.name}, You have received NLe${amount} from ${sender.name}. Your new balance is NLe${recipient.accountBalance}`;
+       const messageSender = `Hello ${sender.name}, You have have sent NLe${amount} to ${recipient.name}. Your new balance is NLe${sender.accountBalance}`;
+       const sendmsg = await sendMsg({
+         numbers: recipient.phone,
+         message: message,
+       });
+       const sendmsg2sender = await sendMsg({
+         numbers: recipient.phone,
+         message: messageSender,
+       });
       res.status(200).json({
         success: true,
         message: "Transaction completed successfully",
