@@ -205,7 +205,7 @@ const transaction = async (req, res) => {
       res.status(200).json({
         success: true,
         message: "Transaction completed successfully",
-        transaction: sender,
+        user: sender,
       });
     }
   } catch (error) {
