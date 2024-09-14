@@ -125,10 +125,11 @@ const transaction = async (req, res) => {
 // check if the sender and recipient exist
     const  recipient = await User.findOne({phone: phone});
     console.log(recipient)
-    const recipientId =  recipient._id;
     if (!recipient) {
       return res.status(404).json({ message: 'Recipient not found' });
     }else{
+    const recipientId =  recipient._id;
+
 
         // uodate the sender and recipient balance
         const sender = await User.findById(senderId);
