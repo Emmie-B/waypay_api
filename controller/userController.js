@@ -55,13 +55,13 @@ const createAccount = async (req, res) => {
       }else if (accountType === "business") {
       const messageBiz = `Hello ${savedUser.name}!\n\n Welcome to WayPay Business.\nNow you can accept payments seamlessly, reach more customers, and turn first-time buyers into loyal customers!. Plus, get access to micro loans when you'er a certified WayPay customer\n\nWayPay - Creating financial possibilities in emerging markets.`;
       messageBiz = await sendMsg({
-        numbers: recipient.phone,
+        numbers: phone,
         message: message,
       });
       }else if (accountType === "driver") {
       const messageDrive = `Hello ${savedUser.name}!\n\n Welcome to WayPay Ride and Drive!.\nYou’re all set to start receiving fares directly to your account!. Plus, get access to micro loans when you'er a certified WayPay customer. \n\nWayPay - Creating financial possibilities in emerging markets.`;
       messageDrive = await sendMsg({
-        numbers: recipient.phone,
+        numbers: phone,
         message: message,
       });
 
