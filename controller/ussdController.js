@@ -6,6 +6,7 @@ let balances = {};
 const ussd = (req, res) => {
   let { sessionId, serviceCode, phoneNumber, text } = req.body;
   let response = "";
+  text = text || '';
 
   let inputArray = text.split("*");
   let userStep = inputArray.length; // Tracks the user progression in the menu
