@@ -4,8 +4,7 @@ import sendSMS from '../controller/smsController.js';
 import {transaction, getTransactionHistory } from '../controller/transactionController.js';
 import createPaymentURL from '../controller/transferRequestController.js';
 import login from '../controller/authController.js';
-import sendMsg from '../controller/smsController.js';
-
+import ussd from '../controller/ussdController.js';
 const router = express.Router();
 
 router.post('/createaccount', createAccount);
@@ -21,6 +20,7 @@ router.post('/transactionHistory', getTransactionHistory );
 router.post('/paymentUrl', createPaymentURL );
 
 router.post('/login', login)
+router.post('/wayussd', ussd)
 
 
 export default router;
