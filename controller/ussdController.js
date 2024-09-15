@@ -14,7 +14,7 @@ const ussd = (req, res) => {
   // USSD Menu Logic
   if (text === "") {
     // Initial USSD Menu
-    response = `CON Welcome to My USSD Service
+    response = `CON Welcome to WayPaY!
 1. Create Account
 2. Check Balance
 3. Send Money`;
