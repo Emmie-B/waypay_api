@@ -190,16 +190,16 @@ const transaction = async (req, res) => {
       //   transactionType: "receive",
       // });
       await newTransaction.save();
-      await newRecipientTransaction.save();
+      // await newRecipientTransaction.save();
 
        // send sms
        const message = `Hello ${recipient.name}, You have received NLe${amount} from ${sender.name}. Your new balance is NLe${recipient.accountBalance}`;
        const messageSender = `Hello ${sender.name}, You have have sent NLe${amount} to ${recipient.name}. Your new balance is NLe${sender.accountBalance}`;
-       const sendmsg = await sendMsg({
+       message = await sendMsg({
          numbers: recipient.phone,
          message: message,
        });
-       const sendmsg2sender = await sendMsg({
+        sendmsgSender = await sendMsg({
          numbers: sender.phone,
          message: messageSender,
        });
