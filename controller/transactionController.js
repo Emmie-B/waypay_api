@@ -13,7 +13,7 @@ import CustomerSubscription from "../models/subscription.model.js";
 import TransactionModel from "../models/transaction.model.js";
 import sendMsg from "./sendMsgController.js";
 
-const makeTransfer = async (req, res) => {
+const makeTransferWithSol = async (req, res) => {
   try {
     const { receiverPhone, receiverPublicKey, amount, pin } = req.body;
 
@@ -97,7 +97,7 @@ const makeTransfer = async (req, res) => {
   }
 };
 
-const getBalance = async (req, res) => {
+const getSolBalance = async (req, res) => {
   try {
     const { publicKey } = req.body;
 
@@ -182,13 +182,13 @@ const transaction = async (req, res) => {
         status: "completed",
         transactionType: "send",
       });
-      const newRecipientTransaction = new TransactionModel({
-        senderId,
-        recipientId,
-        amount,
-        status: "completed",
-        transactionType: "receive",
-      });
+      // const newRecipientTransaction = new TransactionModel({
+      //   senderId,
+      //   recipientId,
+      //   amount,
+      //   status: "completed",
+      //   transactionType: "receive",
+      // });
       await newTransaction.save();
       await newRecipientTransaction.save();
 

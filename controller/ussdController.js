@@ -6,10 +6,9 @@ let balances = {};
 const ussd = (req, res) => {
   let { sessionId, serviceCode, phoneNumber, text } = req.body;
   let response = "";
-  text = text || '';
+  text = text || "";
 
-  let inputArray = text.split("*");
-  let userStep = inputArray.length; // Tracks the user progression in the menu
+ // Tracks the user progression in the menu
 
   // USSD Menu Logic
   if (text === "") {
@@ -21,13 +20,13 @@ const ussd = (req, res) => {
   } else if (text === "1") {
     // Option 1: Create Account
     response = `CON Enter your name:`;
-  } else if (userStep === 2 && inputArray[0] === "1") {
+  } else if (inputArray[0] === "1") {
     // Step 2: Enter account type
     response = `CON Choose account type:
 1. Individual
 2. Business
 3. Driver`;
-  } else if (userStep === 3 && inputArray[0] === "1") {
+  } else if ( inputArray[0] === "1") {
     let name = inputArray[1];
     let accountType =
       inputArray[2] === "1"
@@ -39,7 +38,7 @@ const ussd = (req, res) => {
     users[phoneNumber] = { name, accountType, pin: null };
     balances[phoneNumber] = 10000; // Default balance of 10,000 Leones for new users
     response = `CON Set a 4-digit PIN:`;
-  } else if (userStep === 4 && inputArray[0] === "1") {
+  } else if ( inputArray[0] === "1") {
     // Step 4: Save the PIN and finish registration
     let pin = inputArray[3];
     users[phoneNumber].pin = pin;
