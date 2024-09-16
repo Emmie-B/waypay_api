@@ -128,19 +128,17 @@ const getSolBalance = async (req, res) => {
 const transaction = async (req, res) => {
   const { senderId, phone, amount, pin } = req.body;
   try {
-    // check if the sender and recipient exist
-
+    // Check if the recipient exists
     const recipient = await User.findOne({ phone: phone });
     console.log(recipient);
     if (!recipient) {
       return res.status(404).json({ message: "Recipient not found" });
     } else {
       const recipientId = recipient._id;
-      // uodate the sender and recipient balance
+      // Update the sender and recipient balance
       const sender = await User.findById(senderId);
-      // const recipient = await User.findById(recipientId);
       const transactionAmount = parseInt(amount);
-
+  
       // Check if account balances and amount are valid numbers
       if (
         isNaN(sender.accountBalance) ||
@@ -152,29 +150,24 @@ const transaction = async (req, res) => {
           .status(400)
           .json({ message: "Invalid account balance or amount." });
       }
+  
       // Check if the sender has enough balance
       if (sender.accountBalance < transactionAmount) {
         return res
           .status(400)
           .json({ message: "Insufficient balance for the transaction." });
       }
+  
       // Update the sender's and recipient's balances
-      sender.accountBalance =
-        parseInt(sender.accountBalance) - transactionAmount;
+      sender.accountBalance = parseInt(sender.accountBalance) - transactionAmount;
       recipient.accountBalance =
         parseInt(recipient.accountBalance) + transactionAmount;
-
+  
       // Save the updated balances
       await sender.save();
       await recipient.save();
-
-     
-      // console.log(sendmsg)
-      // console.log(sendmsg2sender)
-
+  
       // Create a new transaction entry
-
-      // const transactionReference = new mongoose.Types.ObjectId();
       const newTransaction = new TransactionModel({
         senderId,
         recipientId,
@@ -182,27 +175,22 @@ const transaction = async (req, res) => {
         status: "completed",
         transactionType: "send",
       });
-      // const newRecipientTransaction = new TransactionModel({
-      //   senderId,
-      //   recipientId,
-      //   amount,
-      //   status: "completed",
-      //   transactionType: "receive",
-      // });
       await newTransaction.save();
-      // await newRecipientTransaction.save();
-
-       // send sms
-       const message = `Hello ${recipient.name}, You have received NLe${amount} from ${sender.name}. Your new balance is NLe${recipient.accountBalance}`;
-       const messageSender = `Hello ${sender.name}, You have have sent NLe${amount} to ${recipient.name}. Your new balance is NLe${sender.accountBalance}`;
-       message = await sendMsg({
-         numbers: recipient.phone,
-         message: message,
-       });
-        sendmsgSender = await sendMsg({
-         numbers: sender.phone,
-         message: messageSender,
-       });
+  
+      // Send SMS notifications
+      const recipientMessage = `Hello ${recipient.name}, You have received NLe${amount} from ${sender.name}. Your new balance is NLe${recipient.accountBalance}`;
+      const senderMessage = `Hello ${sender.name}, You have sent NLe${amount} to ${recipient.name}. Your new balance is NLe${sender.accountBalance}`;
+  
+      await sendMsg({
+        numbers: recipient.phone,
+        message: recipientMessage,
+      });
+  
+      await sendMsg({
+        numbers: sender.phone,
+        message: senderMessage,
+      });
+  
       res.status(200).json({
         success: true,
         message: "Transaction completed successfully",
@@ -213,6 +201,7 @@ const transaction = async (req, res) => {
     console.error("Error processing transaction:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
+  
 };
 
 // Function to subscribe a user to a business
