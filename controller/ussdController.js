@@ -156,7 +156,7 @@ const ussd = async (req, res) => {
         let sender = users[phoneNumber];
         let recipient = users[recipientPhone] || { name: recipientPhone };  // Fallback in case the recipient isn't registered
 
-        await sendMoney(phoneNumber, recipientPhone, amount);
+        // await sendMoney(phoneNumber, recipientPhone, amount);
         
         response = `END You have successfully sent ${amount} Le to ${recipientPhone}. Your new balance is ${balances[phoneNumber]} Le.`;
       } else {
