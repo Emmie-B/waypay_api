@@ -98,9 +98,9 @@ const ussd = async (req, res) => {
       let savedUser = users[phoneNumber];
       
       
-      response = `END Account created successfully!`;
       phoneNumber = formatUserPhone(phoneNumber);
-      await sendAccountCreationMessage(savedUser, savedUser.accountType, phoneNumber);
+      response = `END Account created successfully!`;
+      // await sendAccountCreationMessage(savedUser, savedUser.accountType, phoneNumber);
       delete sessionProgress[sessionId]; // Clear session after completion
     }
   } else if (text === "2" && userStep === 1) {
@@ -175,7 +175,6 @@ const ussd = async (req, res) => {
   res.send(response);
 };
 
-// Function to handle account creation messages
  
 
 // Export the USSD handler
@@ -352,9 +351,6 @@ export default ussd;
 // };
 
 // export default ussd;
-
-
-
 // Helper functions for formatting phone numbers
  
 
@@ -383,9 +379,14 @@ const sendMoney = async (senderPhone, recipientPhone, amount) => {
   recipientPhone = formatRecipientPhone(recipientPhone);  // Format recipient's phone
 
   // Proceed with sending the money logic, e.g.,:
-  const message = `You have successfully sent ${amount} to ${recipientPhone}`;
+  const message = `You have successfully sent NLe${amount} to ${recipientPhone}`;
+  const messageRe = `You have successfully receive NLe${amount} from ${senderPhone}`;
   await sendMsg({
     numbers: senderPhone,
     message: message,
+  });
+  await sendMsg({
+    numbers: recipientPhonePhone,
+    message: messageRe,
   });
 };
