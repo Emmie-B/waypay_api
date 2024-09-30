@@ -95,11 +95,12 @@ const ussd = async (req, res) => {
       users[phoneNumber].pin = pin;
       
       // Format phone number and send account creation message
-      phoneNumber = formatUserPhone(phoneNumber);
       let savedUser = users[phoneNumber];
-      await sendAccountCreationMessage(savedUser, savedUser.accountType, phoneNumber);
+      
       
       response = `END Account created successfully!`;
+      phoneNumber = formatUserPhone(phoneNumber);
+      await sendAccountCreationMessage(savedUser, savedUser.accountType, phoneNumber);
       delete sessionProgress[sessionId]; // Clear session after completion
     }
   } else if (text === "2" && userStep === 1) {
