@@ -1,4 +1,4 @@
-import sendMsg from "./sendMsgController"; 
+import sendMsg from './smsController.js';
 
 let users = {};
 let balances = {};
