@@ -4,7 +4,29 @@ let users = {};
 let balances = {};
 let sessionProgress = {};
 
-// Main USSD route
+// Helper function to format user's phone number
+const formatUserPhone = (phoneNumber) => {
+  if (phoneNumber.startsWith("+232")) {
+    return phoneNumber.replace("+", "");  // Remove "+" for user's phone
+  }
+  return phoneNumber;
+};
+
+// Helper function to format recipient's phone number
+const formatRecipientPhone = (phoneNumber) => {
+  if (phoneNumber.startsWith("0")) {
+    return "+232" + phoneNumber.slice(1);  // Replace leading "0" with "+232"
+  }
+  return phoneNumber;
+};
+
+// Function to send message via SMS
+const sendMsg = async ({ numbers, message }) => {
+  console.log(`Sending message to ${numbers}: ${message}`);
+  // Mock sending message, implement actual SMS service here.
+};
+
+// Main USSD Route
 const ussd = async (req, res) => {
   let { sessionId, serviceCode, phoneNumber, text } = req.body;
   let response = "";
@@ -48,13 +70,13 @@ const ussd = async (req, res) => {
     // Step 3: Set account type and PIN
     let accountType =
       inputArray[2] === "1"
-        ? "Individual"
+        ? "individual"
         : inputArray[2] === "2"
-        ? "Business"
+        ? "business"
         : inputArray[2] === "3"
-        ? "Driver"
+        ? "driver"
         : null;
-    
+
     if (!accountType) {
       response = `CON Please select a valid account type.`;
     } else {
@@ -62,7 +84,7 @@ const ussd = async (req, res) => {
       users[phoneNumber] = {
         name: sessionProgress[sessionId].name,
         accountType,
-        pin: null
+        pin: null,
       };
       balances[phoneNumber] = 100; // Default balance of 10,000 Leones for new users
       response = `CON Set a 4-digit PIN:`;
@@ -76,27 +98,10 @@ const ussd = async (req, res) => {
     } else {
       users[phoneNumber].pin = pin;
       
-      // Send the corresponding account creation message
-      let accountType = users[phoneNumber].accountType;
-      if (accountType === "Individual") {
-        const message = `Hello ${users[phoneNumber].name}, your Personal WayPay account has been successfully created.\nStart sending and receiving money with ease, pay for goods and services and earn tokens which can be used to get cashback on transportation fare, discounts on future purchases, access to micro loans and more.\nAs a welcome bonus, you have been credited with NLe10.\n\nWayPay - Creating financial possibilities in emerging markets.`;
-        await sendMsg({
-          numbers: phoneNumber,
-          message: message,
-        });
-      } else if (accountType === "Business") {
-        const messageBiz = `Hello ${users[phoneNumber].name}!\n\nWelcome to WayPay Business.\nNow you can accept payments seamlessly, reach more customers, and turn first-time buyers into loyal customers! Plus, get access to micro loans when you're a certified WayPay customer.\n\nWayPay - Creating financial possibilities in emerging markets.`;
-        await sendMsg({
-          numbers: phoneNumber,
-          message: messageBiz,
-        });
-      } else if (accountType === "Driver") {
-        const messageDrive = `Hello ${users[phoneNumber].name}!\n\nWelcome to WayPay Ride and Drive!\nYou’re all set to start receiving fares directly to your account! Plus, get access to micro loans when you're a certified WayPay customer.\n\nWayPay - Creating financial possibilities in emerging markets.`;
-        await sendMsg({
-          numbers: phoneNumber,
-          message: messageDrive,
-        });
-      }
+      // Format phone number and send account creation message
+      phoneNumber = formatUserPhone(phoneNumber);
+      let savedUser = users[phoneNumber];
+      await sendAccountCreationMessage(savedUser, savedUser.accountType, phoneNumber);
       
       response = `END Account created successfully!`;
       delete sessionProgress[sessionId]; // Clear session after completion
@@ -141,24 +146,21 @@ const ussd = async (req, res) => {
     // Check if the user has an account and the correct PIN
     if (users[phoneNumber] && users[phoneNumber].pin === pin) {
       if (balances[phoneNumber] >= amount) {
+        // Format phone numbers
+        recipientPhone = formatRecipientPhone(recipientPhone);
+        phoneNumber = formatUserPhone(phoneNumber);
+
         // Transfer the money
         balances[phoneNumber] -= amount;
         if (!balances[recipientPhone]) balances[recipientPhone] = 0;
         balances[recipientPhone] += amount;
 
-        // Sending messages to both sender and recipient
-        const recipientMessage = `Hello ${users[recipientPhone].name}, You have received NLe${amount} from ${users[phoneNumber].name}. Your new balance is NLe${balances[recipientPhone]}`;
-        const senderMessage = `Hello ${users[phoneNumber].name}, You have sent NLe${amount} to ${users[recipientPhone].name}. Your new balance is NLe${balances[phoneNumber]}`;
-        
-        await sendMsg({
-          numbers: recipientPhone,
-          message: recipientMessage,
-        });
-        await sendMsg({
-          numbers: phoneNumber,
-          message: senderMessage,
-        });
+        // Send messages to both sender and recipient
+        let sender = users[phoneNumber];
+        let recipient = users[recipientPhone] || { name: recipientPhone };  // Fallback in case the recipient isn't registered
 
+        await sendMoney(phoneNumber, recipientPhone, amount);
+        
         response = `END You have successfully sent ${amount} Le to ${recipientPhone}. Your new balance is ${balances[phoneNumber]} Le.`;
       } else {
         response = `END Insufficient balance.`;
@@ -176,6 +178,10 @@ const ussd = async (req, res) => {
   res.send(response);
 };
 
+// Function to handle account creation messages
+ 
+
+// Export the USSD handler
 export default ussd;
 
 
@@ -349,3 +355,40 @@ export default ussd;
 // };
 
 // export default ussd;
+
+
+
+// Helper functions for formatting phone numbers
+ 
+
+// Main function to handle account creation messages
+const sendAccountCreationMessage = async (savedUser, accountType, phone) => {
+  phone = formatUserPhone(phone); // Format user's phone number
+
+  let message;
+  if (accountType === "individual") {
+    message = `Hello ${savedUser.name}, your Personal WayPay account has been successfully created.\nStart sending and receiving money with ease, pay for goods and services, and earn tokens which can be used to get cashback on transportation fare, discounts on future purchases, access to micro loans, and more.\nAs a welcome bonus, you have been credited with NLe10.\n\nWayPay - Creating financial possibilities in emerging markets.`;
+  } else if (accountType === "business") {
+    message = `Hello ${savedUser.name}!\n\nWelcome to WayPay Business.\nNow you can accept payments seamlessly, reach more customers, and turn first-time buyers into loyal customers! Plus, get access to micro loans when you're a certified WayPay customer.\n\nWayPay - Creating financial possibilities in emerging markets.`;
+  } else if (accountType === "driver") {
+    message = `Hello ${savedUser.name}!\n\nWelcome to WayPay Ride and Drive!\nYou’re all set to start receiving fares directly to your account! Plus, get access to micro loans when you're a certified WayPay customer.\n\nWayPay - Creating financial possibilities in emerging markets.`;
+  }
+
+  await sendMsg({
+    numbers: phone,
+    message: message,
+  });
+};
+
+// Function to handle sending money
+const sendMoney = async (senderPhone, recipientPhone, amount) => {
+  senderPhone = formatUserPhone(senderPhone);  // Format sender's phone
+  recipientPhone = formatRecipientPhone(recipientPhone);  // Format recipient's phone
+
+  // Proceed with sending the money logic, e.g.,:
+  const message = `You have successfully sent ${amount} to ${recipientPhone}`;
+  await sendMsg({
+    numbers: senderPhone,
+    message: message,
+  });
+};
