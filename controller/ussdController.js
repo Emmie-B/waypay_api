@@ -15,16 +15,12 @@ const formatUserPhone = (phoneNumber) => {
 // Helper function to format recipient's phone number
 const formatRecipientPhone = (phoneNumber) => {
   if (phoneNumber.startsWith("0")) {
-    return "+232" + phoneNumber.slice(1);  // Replace leading "0" with "+232"
+    return "232" + phoneNumber.slice(1);  // Replace leading "0" with "+232"
   }
   return phoneNumber;
 };
 
-// Function to send message via SMS
-const sendMsg = async ({ numbers, message }) => {
-  console.log(`Sending message to ${numbers}: ${message}`);
-  // Mock sending message, implement actual SMS service here.
-};
+ 
 
 // Main USSD Route
 const ussd = async (req, res) => {
